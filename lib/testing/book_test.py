@@ -4,18 +4,26 @@ from book import Book
 
 import io
 import sys
+import unittest
+from unittest.mock import MagicMock
 
-class TestBook:
+
+class TestBook(unittest.TestCase):
     '''Book in book.py'''
 
     def test_initialize_with_title(self):
         '''gets initialized with a title.'''
-        Book("And Then There Were None")
+        mock_page_count = MagicMock()
+        mock_page_count.get_page_count.return_value = None
+        book = Book("And Then There Were None", mock_page_count)
+        self.assertEqual(book.title, "And Then There Were None")
+       
 
     def test_has_title(self):
         '''has the title passed into __init__.'''
         book = Book("And Then There Were None")
         assert(book.title == "And Then There Were None")
+        
 
     def test_has_author_name(self):
         '''can be assigned an author name.'''
@@ -25,7 +33,7 @@ class TestBook:
 
     def test_has_page_count(self):
         '''can be assigned a page count property.'''
-        book = Book("And Then There Were None")
+        book = Book("And Then There Were None", 0)
         book.page_count = 272
         assert book.page_count == 272
 
@@ -53,3 +61,15 @@ class TestBook:
         book.turn_page()
         sys.stdout = sys.__stdout__
         assert(captured_out.getvalue() == "Flipping the page...wow, you read fast!\n")
+        
+        
+if __name__ == '__main__':
+    suite = unittest.TestSuite()
+    suite.addTest(TestBook('test_initialize_with_title'))
+    suite.addTest(TestBook('test_has_title'))
+    suite.addTest(TestBook('test_has_author_name'))
+    suite.addTest(TestBook('test_has_page_count'))
+    suite.addTest(TestBook('test_requires_int_page_count'))
+    suite.addTest(TestBook('test_has_genre'))
+    suite.addTest(TestBook('test_can_turn_page'))
+    unittest.TextTestRunner().run(suite)
